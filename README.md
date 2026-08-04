@@ -1,90 +1,104 @@
 # 🎬 YouTube AI Agent — Video Summarizer & Q&A Assistant
 
-A full-stack Generative AI application that takes any YouTube video URL and lets you:
+A demo app that turns any YouTube video into an AI-powered study assistant.
 
-- Generate a **concise (100–200 word)** or **detailed** summary
-- Extract **10 key learning points**
-- Auto-generate a **10-question MCQ quiz** (with answers)
-- **Ask free-form questions** about the video using Retrieval-Augmented Generation (RAG)
-- Generate **interview-style questions** from educational content
-- **Download** the generated summary as a PDF
-- **Save chat history** per video
+**Features:**
+- Generate a **concise summary** or a **detailed summary** of the video transcript.
+- Extract **10 key learning points**.
+- Create a **10-question multiple-choice quiz** with answers.
+- Generate **interview-style questions**.
+- Ask **free-form questions** about the video using Retrieval-Augmented Generation (RAG).
+- **Download summary content as a PDF**.
+- **Persist chat history per video** locally.
 
 Built with **Python, Streamlit, LangChain, OpenAI API, YouTube Transcript API, and FAISS**.
 
 ---
 
-## 🧱 Architecture
+## 🚀 What it does
 
-```
-User pastes YouTube URL
-        │
-        ▼
-YouTube Transcript API ──► raw transcript text
-        │
-        ├──► LangChain + OpenAI (gpt-4o-mini) ──► Summary / Key Points / Quiz / Interview Qs
-        │
-        └──► Text splitter ──► OpenAI Embeddings ──► FAISS vector index
-                                                          │
-                                    User question ──► Retriever (top-k chunks)
-                                                          │
-                                                          ▼
-                                              LangChain RetrievalQA (RAG) ──► Answer
-```
+1. User pastes a YouTube URL.
+2. The app fetches the transcript using the YouTube Transcript API.
+3. It uses LangChain + OpenAI to generate summaries, quizzes, key points, and interview questions.
+4. It builds a FAISS vector index over transcript chunks for RAG-powered question answering.
+5. Users can ask questions and receive answers based only on retrieved transcript context.
 
-## 📁 Folder Structure
+---
+
+## 📁 Project structure
 
 ```
 youtube-ai-agent/
-├── app.py                  # Streamlit UI and orchestration
+├── app.py                  # Streamlit UI and feature orchestration
+├── requirements.txt       # Python dependency pins
+├── README.md              # Project documentation
 ├── utils/
-│   ├── transcript.py       # Video ID extraction + transcript fetching/chunking
-│   ├── vectorstore.py      # FAISS index building + RAG question answering
-│   ├── ai_features.py      # LangChain chains for summary/key points/quiz/interview Qs
-│   ├── pdf_export.py       # PDF report generation (reportlab)
-│   └── chat_history.py     # JSON-based per-video chat history persistence
+│   ├── transcript.py      # Video ID extraction, transcript fetching, and chunking
+│   ├── vectorstore.py     # FAISS index building and retrieval QA
+│   ├── ai_features.py     # Summary, quiz, interview question generation
+│   ├── pdf_export.py      # PDF generation using reportlab
+│   └── chat_history.py    # Local history persistence per video
 ├── prompts/
-│   └── prompts.py          # All prompt templates (prompt engineering lives here)
-├── data/
-│   └── chat_history.json   # Auto-created at runtime
-├── requirements.txt
-└── README.md
+│   └── prompts.py         # Prompt templates for all AI features
+├── data/                  # Local app-generated data (e.g. chat history)
+└── .gitignore
 ```
 
-## 🚀 Installation
+---
 
-1. **Clone / copy the project folder**, then create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate      # Windows: venv\Scripts\activate
-   ```
+## 🛠️ Installation
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+cd youtube-ai-agent
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+# OR
+source .venv/bin/activate  # macOS / Linux
+pip install -r requirements.txt
+```
 
-3. **Set your OpenAI API key** (either method works):
-   - Enter it directly in the app's sidebar at runtime, **or**
-   - Create a `.env` file in the project root:
-     ```
-     OPENAI_API_KEY=sk-your-key-here
-     ```
+---
 
-4. **Run the app:**
-   ```bash
-   streamlit run app.py
-   ```
+## 🔑 OpenAI setup
 
-5. Open the URL Streamlit prints (usually `http://localhost:8501`), paste a YouTube video URL, click **Load Video**, and explore the tabs.
+The app reads your OpenAI API key from one of these sources:
 
-## ⚠️ Notes & Limitations
+- Enter it in the Streamlit sidebar at runtime.
+- Set an environment variable:
+  ```bash
+  set OPENAI_API_KEY=sk-your-key-here      # Windows PowerShell
+  export OPENAI_API_KEY=sk-your-key-here   # macOS/Linux
+  ```
+- Or use an `.env` file with `python-dotenv` support:
+  ```text
+  OPENAI_API_KEY=sk-your-key-here
+  ```
 
-- Works only on videos that have **captions/transcripts available** (auto-generated or manual). Videos with transcripts disabled will show a friendly error.
-- Very long videos are truncated to a safe character budget before summarization to control token usage/cost — the RAG Q&A tab still searches the **full** transcript via chunking, so long-video Q&A stays accurate even when the summary is truncated.
-- Uses `gpt-4o-mini` by default for a good cost/quality balance; swap the `model_name` in `utils/ai_features.py` / `utils/vectorstore.py` for a different model.
-- Chat history is stored locally in `data/chat_history.json` — fine for a personal/demo project, not intended as production-grade storage.
+---
 
-## 🧠 Resume Bullet
+## ▶️ Run the app
 
-> Developed an AI-powered YouTube Agent that extracts video transcripts, generates intelligent summaries, creates quizzes, and answers user questions using Generative AI. Implemented LangChain, OpenAI API, Prompt Engineering, and RAG architecture with FAISS vector search to enable natural language interaction with YouTube content.
+```bash
+streamlit run app.py
+```
+
+Then open the URL printed by Streamlit, usually `http://localhost:8501`.
+
+---
+
+## ⚠️ Notes
+
+- The app requires a YouTube video with an available transcript.
+- Summaries are truncated to avoid excessive token usage, but question answering still uses chunked transcript context.
+- The default model is `gpt-4o-mini`; you can swap the model in `utils/ai_features.py` and `utils/vectorstore.py`.
+- Chat history is stored locally in `data/chat_history.json`, so this is best for demo or personal use, not production.
+
+---
+
+## 📌 GitHub
+https://github.com/Samarth4517/Youtube-AI-Agent
+
+---
+
+## 🧠 Summary
+A YouTube content assistant that extracts transcripts, creates summaries and quizzes, and answers video questions using OpenAI, LangChain, and FAISS-powered retrieval.
